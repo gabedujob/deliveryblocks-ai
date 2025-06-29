@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeliveryBlocks AI</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+        }
+        
+        .prediction-high {
+            background-color: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid #22c55e;
+        }
+        
+        .prediction-medium {
+            background-color: rgba(251, 146, 60, 0.1);
+            border-left: 4px solid #fb923c;
+        }
+        
+        .prediction-low {
+            background-color: rgba(156, 163, 175, 0.1);
+            border-left: 4px solid #9ca3af;
+        }
+        
+        .dark .prediction-high {
+            background-color: rgba(34, 197, 94, 0.2);
+        }
+        
+        .dark .prediction-medium {
+            background-color: rgba(251, 146, 60, 0.2);
+        }
+        
+        .dark .prediction-low {
+            background-color: rgba(156, 163, 175, 0.2);
+        }
+        
+        .station-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        
+        .dark .station-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: .5;
+            }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .flag-button {
+            transition: transform 0.2s ease;
+        }
+        
+        .flag-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, createContext, useContext } = React;
+
+        // Translations
+        const translations = {
+            'pt-BR': {
+                // Header
+                appTitle: 'DeliveryBlocks AI',
+                clearData: 'Limpar Dados',
+                clearDataConfirm: 'Deseja limpar todos os dados?',
+                
+                // Tabs
+                dashboard: '📊 Dashboard',
+                register: '📝 Registrar',
+                predictions: '🎯 Previsões',
+                analysis: '📈 Análises',
+                
+                // Dashboard
+                summary: '📈 Resumo Geral',
+                totalBlocks: 'Total Blocos',
+                accepted: 'Aceitos',
+                avgValue: 'Valor Médio',
+                nextOpportunities: '🎯 Próximas Oportunidades',
+                registerMoreBlocks: 'Registre mais blocos para ver previsões',
+                bestStations: '🏆 Melhores Estações',
+                
+                // Register
+                quickRegister: '⚡ Registro de Bloco',
+                station: 'Estação',
+                stationPlaceholder: 'Ex: DWS2, UWA1...',
+                value: 'Valor (R$)',
+                valuePlaceholder: 'Ex: 120',
+                accepted: 'Aceitei este bloco',
+                addBlock: 'Adicionar Bloco',
+                cancel: 'Cancelar',
+                
+                // Predictions
+                predictionsToday: '🎯 Previsões para Hoje',
+                confidence: 'confiança',
+                collectMoreData: '📊 Colete mais dados para\ngerar previsões precisas',
+                
+                // Analysis
+                detailedAnalysis: '📈 Análise Detalhada',
+                registerBlocksAnalysis: 'Registre blocos para ver análises',
+                averageValue: 'Valor Médio',
+                successRate: 'Taxa de Sucesso',
+                bestTimes: '🕐 Melhores horários:',
+                bestDays: '📅 Melhores dias:',
+                insufficientData: 'Dados insuficientes',
+                highValueBlocks: 'blocos alto valor',
+                
+                // Days
+                sunday: 'Domingo',
+                monday: 'Segunda',
+                tuesday: 'Terça',
+                wednesday: 'Quarta',
+                thursday: 'Quinta',
+                friday: 'Sexta',
+                saturday: 'Sábado',
+                
+                // Day abbreviations
+                sun: 'Dom',
+                mon: 'Seg',
+                tue: 'Ter',
+                wed: 'Qua',
+                thu: 'Qui',
+                fri: 'Sex',
+                sat: 'Sáb',
+                
+                // Recommendations
+                highProbability: '🟢 ALTA probabilidade! Recomendo ficar online',
+                goodChance: '🟡 BOA chance. Vale a pena verificar',
+                lowProbability: '🔴 Probabilidade baixa. Talvez seja melhor aguardar',
+                
+                // Time
+                allDay: 'Todo o dia',
+                predictedValue: 'Valor previsto:',
+                
+                // Common values
+                commonValues: 'Valores comuns:'
+            },
+            'en-US': {
+                // Header
+                appTitle: 'DeliveryBlocks AI',
+                clearData: 'Clear Data',
+                clearDataConfirm: 'Do you want to clear all data?',
+                
+                // Tabs
+                dashboard: '📊 Dashboard',
+                register: '📝 Register',
+                predictions: '🎯 Predictions',
+                analysis: '📈 Analysis',
+                
+                // Dashboard
+                summary: '📈 General Summary',
+                totalBlocks: 'Total Blocks',
+                accepted: 'Accepted',
+                avgValue: 'Avg Value',
+                nextOpportunities: '🎯 Next Opportunities',
+                registerMoreBlocks: 'Register more blocks to see predictions',
+                bestStations: '🏆 Best Stations',
+                
+                // Register
+                quickRegister: '⚡ Block Registration',
+                station: 'Station',
+                stationPlaceholder: 'Ex: DWS2, UWA1...',
+                value: 'Value ($)',
+                valuePlaceholder: 'Ex: 120',
+                accepted: 'I accepted this block',
+                addBlock: 'Add Block',
+                cancel: 'Cancel',
+                
+                // Predictions
+                predictionsToday: '🎯 Today\'s Predictions',
+                confidence: 'confidence',
+                collectMoreData: '📊 Collect more data to\ngenerate accurate predictions',
+                
+                // Analysis
+                detailedAnalysis: '📈 Detailed Analysis',
+                registerBlocksAnalysis: 'Register blocks to see analysis',
+                averageValue: 'Average Value',
+                successRate: 'Success Rate',
+                bestTimes: '🕐 Best times:',
+                bestDays: '📅 Best days:',
+                insufficientData: 'Insufficient data',
+                highValueBlocks: 'high value blocks',
+                
+                // Days
+                sunday: 'Sunday',
+                monday: 'Monday',
+                tuesday: 'Tuesday',
+                wednesday: 'Wednesday',
+                thursday: 'Thursday',
+                friday: 'Friday',
+                saturday: 'Saturday',
+                
+                // Day abbreviations
+                sun: 'Sun',
+                mon: 'Mon',
+                tue: 'Tue',
+                wed: 'Wed',
+                thu: 'Thu',
+                fri: 'Fri',
+                sat: 'Sat',
+                
+                // Recommendations
+                highProbability: '🟢 HIGH probability! Recommend staying online',
+                goodChance: '🟡 GOOD chance. Worth checking',
+                lowProbability: '🔴 Low probability. Maybe better to wait',
+                
+                // Time
+                allDay: 'All day',
+                predictedValue: 'Predicted value:',
+                
+                // Common values
+                commonValues: 'Common values:'
+            }
+        };
+
+        // Context for theme and language
+        const AppContext = createContext();
+
+        // Componente Principal
+        function DeliveryBlocksApp() {
+            const [currentTab, setCurrentTab] = useState(0);
+            const [blocks, setBlocks] = useState(() => {
+                const saved = localStorage.getItem('deliveryBlocks');
+                return saved ? JSON.parse(saved) : [];
+            });
+            
+            // Theme and Language states
+            const [isDark, setIsDark] = useState(() => {
+                const saved = localStorage.getItem('isDark');
+                return saved ? JSON.parse(saved) : false;
+            });
+            
+            const [language, setLanguage] = useState(() => {
+                const saved = localStorage.getItem('language');
+                return saved || 'pt-BR';
+            });
+
+            // Update document class for dark mode
+            useEffect(() => {
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+                localStorage.setItem('isDark', JSON.stringify(isDark));
+            }, [isDark]);
+
+            // Save language preference
+            useEffect(() => {
+                localStorage.setItem('language', language);
+                document.documentElement.lang = language;
+            }, [language]);
+
+            // Salvar dados no localStorage quando blocks mudar
+            useEffect(() => {
+                localStorage.setItem('deliveryBlocks', JSON.stringify(blocks));
+            }, [blocks]);
+
+            // Análise de padrões
+            const patterns = useMemo(() => analyzePatterns(blocks), [blocks]);
+            
+            // Previsões
+            const predictions = useMemo(() => generatePredictions(patterns, language), [patterns, language]);
+
+            const t = translations[language];
+            const tabs = [t.dashboard, t.register, t.predictions, t.analysis];
+
+            const toggleTheme = () => setIsDark(!isDark);
+            const toggleLanguage = () => setLanguage(language === 'pt-BR' ? 'en-US' : 'pt-BR');
+
+            const contextValue = {
+                isDark,
+                language,
+                t,
+                toggleTheme,
+                toggleLanguage
+            };
+
+            return (
+                <AppContext.Provider value={contextValue}>
+                    <div className={`min-h-screen transition-colors duration-200 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+                        {/* Header */}
+                        <header className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} shadow-sm border-b transition-colors duration-200`}>
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <div className="flex justify-between items-center h-16">
+                                    <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                        🚚 {t.appTitle}
+                                    </h1>
+                                    
+                                    <div className="flex items-center space-x-4">
+                                        {/* Language Toggle */}
+                                        <div className="flex items-center space-x-2">
+                                            <button
+                                                onClick={toggleLanguage}
+                                                className={`flag-button text-2xl ${language === 'pt-BR' ? 'opacity-100' : 'opacity-50'}`}
+                                                title="Português"
+                                            >
+                                                🇧🇷
+                                            </button>
+                                            <button
+                                                onClick={toggleLanguage}
+                                                className={`flag-button text-2xl ${language === 'en-US' ? 'opacity-100' : 'opacity-50'}`}
+                                                title="English"
+                                            >
+                                                🇺🇸
+                                            </button>
+                                        </div>
+                                        
+                                        {/* Theme Toggle */}
+                                        <button
+                                            onClick={toggleTheme}
+                                            className={`p-2 rounded-lg transition-colors ${
+                                                isDark 
+                                                    ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600' 
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                            }`}
+                                            title={isDark ? 'Light Mode' : 'Dark Mode'}
+                                        >
+                                            {isDark ? '☀️' : '🌙'}
+                                        </button>
+                                        
+                                        {/* Clear Data */}
+                                        <button
+                                            onClick={() => {
+                                                if (confirm(t.clearDataConfirm)) {
+                                                    setBlocks([]);
+                                                }
+                                            }}
+                                            className={`text-sm transition-colors ${
+                                                isDark 
+                                                    ? 'text-red-400 hover:text-red-300' 
+                                                    : 'text-red-600 hover:text-red-800'
+                                            }`}
+                                        >
+                                            {t.clearData}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </header>
+
+                        {/* Tabs */}
+                        <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} border-b transition-colors duration-200`}>
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <div className="flex space-x-8">
+                                    {tabs.map((tab, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentTab(index)}
+                                            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                                                currentTab === index
+                                                    ? 'tab-active'
+                                                    : `border-transparent ${
+                                                        isDark 
+                                                            ? 'text-gray-400 hover:text-gray-200 hover:border-gray-600' 
+                                                            : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                                    }`
+                                            }`}
+                                        >
+                                            {tab}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content */}
+                        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                            {currentTab === 0 && <DashboardScreen blocks={blocks} patterns={patterns} predictions={predictions} />}
+                            {currentTab === 1 && <RegisterScreen onAddBlock={(block) => setBlocks([...blocks, block])} />}
+                            {currentTab === 2 && <PredictionsScreen predictions={predictions} />}
+                            {currentTab === 3 && <AnalysisScreen patterns={patterns} blocks={blocks} />}
+                        </main>
+                    </div>
+                </AppContext.Provider>
+            );
+        }
+
+        // Dashboard Screen
+        function DashboardScreen({ blocks, patterns, predictions }) {
+            const { isDark, t } = useContext(AppContext);
+            
+            const stats = {
+                total: blocks.length,
+                accepted: blocks.filter(b => b.accepted).length,
+                avgValue: blocks.length > 0 
+                    ? Math.round(blocks.reduce((sum, b) => sum + b.value, 0) / blocks.length)
+                    : 0
+            };
+
+            return (
+                <div className="space-y-6">
+                    {/* Stats Card */}
+                    <div className={`bg-gradient-to-r ${
+                        isDark 
+                            ? 'from-blue-600 to-blue-700' 
+                            : 'from-blue-500 to-blue-600'
+                    } rounded-lg shadow-lg p-6 text-white`}>
+                        <h2 className="text-xl font-bold mb-4">{t.summary}</h2>
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="text-center">
+                                <div className="text-3xl font-bold">{stats.total}</div>
+                                <div className="text-sm opacity-90">{t.totalBlocks}</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-3xl font-bold">{stats.accepted}</div>
+                                <div className="text-sm opacity-90">{t.accepted}</div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-3xl font-bold">
+                                    {t.value?.includes('$') ? '$' : 'R$'} {stats.avgValue}
+                                </div>
+                                <div className="text-sm opacity-90">{t.avgValue}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Próximas Oportunidades */}
+                    <div>
+                        <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            {t.nextOpportunities}
+                        </h3>
+                        <div className="space-y-3">
+                            {predictions.slice(0, 3).map((prediction, index) => (
+                                <PredictionCard key={index} prediction={prediction} />
+                            ))}
+                            {predictions.length === 0 && (
+                                <div className={`${
+                                    isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-500'
+                                } rounded-lg p-8 text-center transition-colors duration-200`}>
+                                    <i className="fas fa-chart-line text-4xl mb-2"></i>
+                                    <p>{t.registerMoreBlocks}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Melhores Estações */}
+                    <div>
+                        <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            {t.bestStations}
+                        </h3>
+                        <div className="grid gap-3">
+                            {patterns.slice(0, 3).map((pattern, index) => (
+                                <StationCard key={index} pattern={pattern} />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Register Screen - Simplified without quick stations
+        function RegisterScreen({ onAddBlock }) {
+            const { isDark, t } = useContext(AppContext);
+            const [station, setStation] = useState('');
+            const [value, setValue] = useState('');
+            const [accepted, setAccepted] = useState(false);
+            
+            // Get user's common stations for autocomplete
+            const [existingStations, setExistingStations] = useState(() => {
+                const blocks = JSON.parse(localStorage.getItem('deliveryBlocks') || '[]');
+                const stations = [...new Set(blocks.map(b => b.station))];
+                return stations;
+            });
+
+            // Get common values for quick selection
+            const [commonValues, setCommonValues] = useState(() => {
+                const blocks = JSON.parse(localStorage.getItem('deliveryBlocks') || '[]');
+                const values = blocks.map(b => b.value).filter(v => v > 0);
+                const uniqueValues = [...new Set(values)].sort((a, b) => b - a);
+                return uniqueValues.slice(0, 6);
+            });
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (station && value) {
+                    const now = new Date();
+                    const block = {
+                        id: Date.now().toString(),
+                        station: station.toUpperCase(),
+                        value: parseFloat(value),
+                        startTime: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        endTime: new Date(now.getTime() + 2 * 60 * 60 * 1000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        date: now.toLocaleDateString('pt-BR'),
+                        dayOfWeek: now.getDay(),
+                        hour: now.getHours(),
+                        accepted,
+                        timestamp: now.getTime()
+                    };
+                    onAddBlock(block);
+                    
+                    // Update existing stations
+                    if (!existingStations.includes(station.toUpperCase())) {
+                        setExistingStations([...existingStations, station.toUpperCase()]);
+                    }
+                    
+                    // Clear form
+                    setStation('');
+                    setValue('');
+                    setAccepted(false);
+                }
+            };
+
+            return (
+                <div className="space-y-6">
+                    <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                        {t.quickRegister}
+                    </h2>
+                    
+                    <div className={`${
+                        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
+                    } rounded-lg shadow-lg p-6 border transition-colors duration-200`}>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${
+                                    isDark ? 'text-gray-200' : 'text-gray-700'
+                                }`}>
+                                    {t.station}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={station}
+                                    onChange={(e) => setStation(e.target.value)}
+                                    placeholder={t.stationPlaceholder}
+                                    list="stations"
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                                        isDark 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                    required
+                                />
+                                <datalist id="stations">
+                                    {existingStations.map(s => (
+                                        <option key={s} value={s} />
+                                    ))}
+                                </datalist>
+                            </div>
+                            
+                            <div>
+                                <label className={`block text-sm font-medium mb-2 ${
+                                    isDark ? 'text-gray-200' : 'text-gray-700'
+                                }`}>
+                                    {t.value}
+                                </label>
+                                <input
+                                    type="number"
+                                    value={value}
+                                    onChange={(e) => setValue(e.target.value)}
+                                    placeholder={t.valuePlaceholder}
+                                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                                        isDark 
+                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                                    }`}
+                                    required
+                                />
+                                
+                                {/* Common Values Quick Select */}
+                                {commonValues.length > 0 && (
+                                    <div className="mt-2">
+                                        <p className={`text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            {t.commonValues}
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {commonValues.map(val => (
+                                                <button
+                                                    key={val}
+                                                    type="button"
+                                                    onClick={() => setValue(val.toString())}
+                                                    className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                                                        isDark
+                                                            ? 'bg-blue-900 text-blue-200 hover:bg-blue-800'
+                                                            : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                                    }`}
+                                                >
+                                                    {t.value?.includes('$') ? '$' : 'R$'}{val}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="accepted"
+                                    checked={accepted}
+                                    onChange={(e) => setAccepted(e.target.checked)}
+                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                />
+                                <label htmlFor="accepted" className={`ml-3 text-sm ${
+                                    isDark ? 'text-gray-200' : 'text-gray-700'
+                                }`}>
+                                    {t.accepted}
+                                </label>
+                            </div>
+                            
+                            <button
+                                type="submit"
+                                className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium"
+                            >
+                                {t.addBlock}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        // Predictions Screen
+        function PredictionsScreen({ predictions }) {
+            const { isDark, t } = useContext(AppContext);
+            
+            return (
+                <div className="space-y-6">
+                    <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                        {t.predictionsToday}
+                    </h2>
+                    
+                    {predictions.length > 0 ? (
+                        <div className="space-y-3">
+                            {predictions.map((prediction, index) => (
+                                <PredictionCard key={index} prediction={prediction} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className={`${
+                            isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                        } rounded-lg p-12 text-center transition-colors duration-200`}>
+                            <i className="fas fa-chart-bar text-6xl mb-4"></i>
+                            <p className="text-lg whitespace-pre-line">
+                                {t.collectMoreData}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Prediction Card Component
+        function PredictionCard({ prediction }) {
+            const { isDark, t } = useContext(AppContext);
+            const confidenceClass = prediction.confidence > 0.8 ? 'prediction-high' : 
+                                  prediction.confidence > 0.6 ? 'prediction-medium' : 
+                                  'prediction-low';
+            
+            return (
+                <div className={`${
+                    isDark ? 'bg-gray-800' : 'bg-white'
+                } rounded-lg shadow p-4 ${confidenceClass} slide-in transition-colors duration-200`}>
+                    <div className="flex justify-between items-start mb-3">
+                        <h4 className={`font-bold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            📍 {prediction.station}
+                        </h4>
+                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            prediction.confidence > 0.8 ? 'bg-green-100 text-green-800' :
+                            prediction.confidence > 0.6 ? 'bg-orange-100 text-orange-800' :
+                            'bg-gray-100 text-gray-800'
+                        }`}>
+                            {Math.round(prediction.confidence * 100)}% {t.confidence}
+                        </span>
+                    </div>
+                    
+                    <div className={`space-y-1 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                        <p>⏰ {prediction.timeSlot}</p>
+                        <p>📅 {prediction.dayOfWeek}</p>
+                        <p>{t.predictedValue} <span className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            {t.value?.includes('$') ? '$' : 'R$'} {Math.round(prediction.predictedValue)}
+                        </span></p>
+                    </div>
+                    
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                        <p className={`text-sm font-medium ${
+                            prediction.confidence > 0.8 ? 'text-green-600' :
+                            prediction.confidence > 0.6 ? 'text-orange-600' :
+                            'text-gray-600'
+                        }`}>
+                            {prediction.recommendation}
+                        </p>
+                    </div>
+                </div>
+            );
+        }
+
+        // Analysis Screen
+        function AnalysisScreen({ patterns, blocks }) {
+            const { isDark, t } = useContext(AppContext);
+            
+            return (
+                <div className="space-y-6">
+                    <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                        {t.detailedAnalysis}
+                    </h2>
+                    
+                    {patterns.length > 0 ? (
+                        <div className="space-y-4">
+                            {patterns.map((pattern, index) => (
+                                <StationAnalysisCard key={index} pattern={pattern} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className={`${
+                            isDark ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-600'
+                        } rounded-lg p-12 text-center transition-colors duration-200`}>
+                            <i className="fas fa-analytics text-6xl mb-4"></i>
+                            <p className="text-lg">
+                                {t.registerBlocksAnalysis}
+                            </p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // Station Card Component
+        function StationCard({ pattern }) {
+            const { isDark, t } = useContext(AppContext);
+            
+            return (
+                <div className={`${
+                    isDark ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:bg-gray-50'
+                } rounded-lg shadow p-4 hover:shadow-md transition-all duration-200 station-card`}>
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h4 className={`font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                📍 {pattern.station}
+                            </h4>
+                            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {t.value?.includes('$') ? '$' : 'R$'} {Math.round(pattern.averageValue)} • {Math.round(pattern.successRate * 100)}%
+                            </p>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-2xl font-bold text-blue-600">
+                                {pattern.highValueBlocks}/{pattern.totalBlocks}
+                            </p>
+                            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                                {t.highValueBlocks}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Station Analysis Card
+        function StationAnalysisCard({ pattern }) {
+            const { isDark, t, language } = useContext(AppContext);
+            const dayNames = language === 'pt-BR' 
+                ? [t.sun, t.mon, t.tue, t.wed, t.thu, t.fri, t.sat]
+                : [t.sun, t.mon, t.tue, t.wed, t.thu, t.fri, t.sat];
+            
+            return (
+                <div className={`${
+                    isDark ? 'bg-gray-800' : 'bg-white'
+                } rounded-lg shadow p-6 transition-colors duration-200`}>
+                    <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                        📍 {pattern.station}
+                    </h3>
+                    
+                    <div className="grid grid-cols-3 gap-4 mb-6">
+                        <div className="text-center">
+                            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {t.averageValue}
+                            </p>
+                            <p className="text-2xl font-bold text-blue-600">
+                                {t.value?.includes('$') ? '$' : 'R$'} {Math.round(pattern.averageValue)}
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {t.successRate}
+                            </p>
+                            <p className="text-2xl font-bold text-green-600">
+                                {Math.round(pattern.successRate * 100)}%
+                            </p>
+                        </div>
+                        <div className="text-center">
+                            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {t.totalBlocks}
+                            </p>
+                            <p className="text-2xl font-bold text-purple-600">{pattern.totalBlocks}</p>
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                        <div>
+                            <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                                {t.bestTimes}
+                            </p>
+                            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {pattern.bestHours.length > 0 
+                                    ? pattern.bestHours.map(h => `${h}h`).join(', ')
+                                    : t.insufficientData}
+                            </p>
+                        </div>
+                        
+                        <div>
+                            <p className={`text-sm font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}`}>
+                                {t.bestDays}
+                            </p>
+                            <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                {pattern.bestDays.length > 0
+                                    ? pattern.bestDays.map(d => dayNames[d]).join(', ')
+                                    : t.insufficientData}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        // Analysis Functions
+        function analyzePatterns(blocks) {
+            const stationGroups = blocks.reduce((acc, block) => {
+                if (!acc[block.station]) acc[block.station] = [];
+                acc[block.station].push(block);
+                return acc;
+            }, {});
+
+            return Object.entries(stationGroups).map(([station, stationBlocks]) => {
+                const values = stationBlocks.map(b => b.value).filter(v => v > 0);
+                const averageValue = values.length > 0 
+                    ? values.reduce((sum, v) => sum + v, 0) / values.length 
+                    : 0;
+                
+                const highValueThreshold = averageValue * 1.2;
+                const highValueBlocks = stationBlocks.filter(b => b.value >= highValueThreshold);
+                
+                // Best hours
+                const hourCounts = highValueBlocks.reduce((acc, block) => {
+                    acc[block.hour] = (acc[block.hour] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const bestHours = Object.entries(hourCounts)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 3)
+                    .map(([hour]) => parseInt(hour));
+                
+                // Best days
+                const dayCounts = highValueBlocks.reduce((acc, block) => {
+                    acc[block.dayOfWeek] = (acc[block.dayOfWeek] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const bestDays = Object.entries(dayCounts)
+                    .sort(([,a], [,b]) => b - a)
+                    .slice(0, 3)
+                    .map(([day]) => parseInt(day));
+                
+                const successRate = stationBlocks.length > 0
+                    ? stationBlocks.filter(b => b.accepted).length / stationBlocks.length
+                    : 0;
+                
+                return {
+                    station,
+                    averageValue,
+                    bestHours,
+                    bestDays,
+                    successRate,
+                    totalBlocks: stationBlocks.length,
+                    highValueBlocks: highValueBlocks.length
+                };
+            }).sort((a, b) => b.averageValue - a.averageValue);
+        }
+
+        function generatePredictions(patterns, language) {
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentDay = now.getDay();
+            const t = translations[language];
+            const dayNames = language === 'pt-BR' 
+                ? [t.sunday, t.monday, t.tuesday, t.wednesday, t.thursday, t.friday, t.saturday]
+                : [t.sunday, t.monday, t.tuesday, t.wednesday, t.thursday, t.friday, t.saturday];
+            
+            return patterns
+                .filter(pattern => pattern.totalBlocks >= 3)
+                .map(pattern => {
+                    const isGoodHour = pattern.bestHours.includes(currentHour) || 
+                                     pattern.bestHours.includes((currentHour + 1) % 24);
+                    const isGoodDay = pattern.bestDays.includes(currentDay);
+                    
+                    let confidence = 0.4;
+                    if (isGoodHour && isGoodDay) confidence = 0.9;
+                    else if (isGoodHour || isGoodDay) confidence = 0.7;
+                    
+                    let predictedValue = pattern.averageValue * 0.9;
+                    if (isGoodHour && isGoodDay) predictedValue = pattern.averageValue * 1.3;
+                    else if (isGoodHour || isGoodDay) predictedValue = pattern.averageValue * 1.1;
+                    
+                    const timeSlot = pattern.bestHours.length > 0
+                        ? (() => {
+                            const nextBestHour = pattern.bestHours.find(h => h > currentHour) || pattern.bestHours[0];
+                            return `${nextBestHour}:00 - ${(nextBestHour + 2) % 24}:00`;
+                        })()
+                        : t.allDay;
+                    
+                    const recommendation = confidence > 0.8 
+                        ? t.highProbability
+                        : confidence > 0.6
+                        ? t.goodChance
+                        : t.lowProbability;
+                    
+                    return {
+                        station: pattern.station,
+                        predictedValue,
+                        confidence,
+                        timeSlot,
+                        dayOfWeek: dayNames[currentDay],
+                        recommendation
+                    };
+                })
+                .sort((a, b) => b.confidence - a.confidence);
+        }
+
+        // Render App
+        ReactDOM.render(<DeliveryBlocksApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
