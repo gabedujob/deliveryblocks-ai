@@ -114,18 +114,13 @@
         // Translations
         const translations = {
             'pt-BR': {
-                // Header
                 appTitle: 'BlocksTracker',
                 clearData: 'Limpar Dados',
                 clearDataConfirm: 'Deseja limpar todos os dados?',
-                
-                // Tabs
                 dashboard: '📊 Dashboard',
                 register: '📝 Registrar',
                 predictions: '🎯 Previsões',
                 analysis: '📈 Análises',
-                
-                // Dashboard
                 summary: '📈 Resumo Geral',
                 totalBlocks: 'Total Blocos',
                 accepted: 'Aceitos',
@@ -133,8 +128,6 @@
                 nextOpportunities: '🎯 Próximas Oportunidades',
                 registerMoreBlocks: 'Registre mais blocos para ver previsões',
                 bestStations: '🏆 Melhores Estações',
-                
-                // Register
                 quickRegister: '⚡ Registro de Bloco',
                 station: 'Estação',
                 stationPlaceholder: 'Ex: DWS2, UWA1...',
@@ -143,13 +136,9 @@
                 accepted: 'Aceitei este bloco',
                 addBlock: 'Adicionar Bloco',
                 cancel: 'Cancelar',
-                
-                // Predictions
                 predictionsToday: '🎯 Previsões para Hoje',
                 confidence: 'confiança',
                 collectMoreData: '📊 Colete mais dados para\ngerar previsões precisas',
-                
-                // Analysis
                 detailedAnalysis: '📈 Análise Detalhada',
                 registerBlocksAnalysis: 'Registre blocos para ver análises',
                 averageValue: 'Valor Médio',
@@ -158,8 +147,6 @@
                 bestDays: '📅 Melhores dias:',
                 insufficientData: 'Dados insuficientes',
                 highValueBlocks: 'blocos alto valor',
-                
-                // Days
                 sunday: 'Domingo',
                 monday: 'Segunda',
                 tuesday: 'Terça',
@@ -167,8 +154,6 @@
                 thursday: 'Quinta',
                 friday: 'Sexta',
                 saturday: 'Sábado',
-                
-                // Day abbreviations
                 sun: 'Dom',
                 mon: 'Seg',
                 tue: 'Ter',
@@ -176,32 +161,21 @@
                 thu: 'Qui',
                 fri: 'Sex',
                 sat: 'Sáb',
-                
-                // Recommendations
                 highProbability: '🟢 ALTA probabilidade! Recomendo ficar online',
                 goodChance: '🟡 BOA chance. Vale a pena verificar',
                 lowProbability: '🔴 Probabilidade baixa. Talvez seja melhor aguardar',
-                
-                // Time
                 allDay: 'Todo o dia',
                 predictedValue: 'Valor previsto:',
-                
-                // Common values
                 commonValues: 'Valores comuns:'
             },
             'en-US': {
-                // Header
                 appTitle: 'BlocksTracker',
                 clearData: 'Clear Data',
                 clearDataConfirm: 'Do you want to clear all data?',
-                
-                // Tabs
                 dashboard: '📊 Dashboard',
                 register: '📝 Register',
                 predictions: '🎯 Predictions',
                 analysis: '📈 Analysis',
-                
-                // Dashboard
                 summary: '📈 General Summary',
                 totalBlocks: 'Total Blocks',
                 accepted: 'Accepted',
@@ -209,8 +183,6 @@
                 nextOpportunities: '🎯 Next Opportunities',
                 registerMoreBlocks: 'Register more blocks to see predictions',
                 bestStations: '🏆 Best Stations',
-                
-                // Register
                 quickRegister: '⚡ Block Registration',
                 station: 'Station',
                 stationPlaceholder: 'Ex: DWS2, UWA1...',
@@ -219,13 +191,9 @@
                 accepted: 'I accepted this block',
                 addBlock: 'Add Block',
                 cancel: 'Cancel',
-                
-                // Predictions
                 predictionsToday: '🎯 Today\'s Predictions',
                 confidence: 'confidence',
                 collectMoreData: '📊 Collect more data to\ngenerate accurate predictions',
-                
-                // Analysis
                 detailedAnalysis: '📈 Detailed Analysis',
                 registerBlocksAnalysis: 'Register blocks to see analysis',
                 averageValue: 'Average Value',
@@ -234,8 +202,6 @@
                 bestDays: '📅 Best days:',
                 insufficientData: 'Insufficient data',
                 highValueBlocks: 'high value blocks',
-                
-                // Days
                 sunday: 'Sunday',
                 monday: 'Monday',
                 tuesday: 'Tuesday',
@@ -243,8 +209,6 @@
                 thursday: 'Thursday',
                 friday: 'Friday',
                 saturday: 'Saturday',
-                
-                // Day abbreviations
                 sun: 'Sun',
                 mon: 'Mon',
                 tue: 'Tue',
@@ -252,25 +216,17 @@
                 thu: 'Thu',
                 fri: 'Fri',
                 sat: 'Sat',
-                
-                // Recommendations
                 highProbability: '🟢 HIGH probability! Recommend staying online',
                 goodChance: '🟡 GOOD chance. Worth checking',
                 lowProbability: '🔴 Low probability. Maybe better to wait',
-                
-                // Time
                 allDay: 'All day',
                 predictedValue: 'Predicted value:',
-                
-                // Common values
                 commonValues: 'Common values:'
             }
         };
 
-        // Context for theme and language
         const AppContext = createContext();
 
-        // Componente Principal
         function DeliveryBlocksApp() {
             const [currentTab, setCurrentTab] = useState(0);
             const [blocks, setBlocks] = useState(() => {
@@ -278,7 +234,6 @@
                 return saved ? JSON.parse(saved) : [];
             });
             
-            // Theme and Language states
             const [isDark, setIsDark] = useState(() => {
                 const saved = localStorage.getItem('isDark');
                 return saved ? JSON.parse(saved) : false;
@@ -289,7 +244,6 @@
                 return saved || 'pt-BR';
             });
 
-            // Update document class for dark mode
             useEffect(() => {
                 if (isDark) {
                     document.documentElement.classList.add('dark');
@@ -299,21 +253,16 @@
                 localStorage.setItem('isDark', JSON.stringify(isDark));
             }, [isDark]);
 
-            // Save language preference
             useEffect(() => {
                 localStorage.setItem('language', language);
                 document.documentElement.lang = language;
             }, [language]);
 
-            // Salvar dados no localStorage quando blocks mudar
             useEffect(() => {
                 localStorage.setItem('deliveryBlocks', JSON.stringify(blocks));
             }, [blocks]);
 
-            // Análise de padrões
             const patterns = useMemo(() => analyzePatterns(blocks), [blocks]);
-            
-            // Previsões
             const predictions = useMemo(() => generatePredictions(patterns, language), [patterns, language]);
 
             const t = translations[language];
@@ -333,7 +282,6 @@
             return (
                 <AppContext.Provider value={contextValue}>
                     <div className={`min-h-screen transition-colors duration-200 ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
-                        {/* Header */}
                         <header className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} shadow-sm border-b transition-colors duration-200`}>
                             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                                 <div className="flex justify-between items-center h-16">
@@ -342,7 +290,6 @@
                                     </h1>
                                     
                                     <div className="flex items-center space-x-4">
-                                        {/* Language Toggle */}
                                         <div className="flex items-center space-x-1">
                                             <button
                                                 onClick={toggleLanguage}
@@ -351,10 +298,10 @@
                                                 }`}
                                                 title="Português"
                                             >
-                                                <svg width="24" height="16" viewBox="0 0 3 2" className="rounded-sm">
-                                                    <rect width="3" height="2" fill="#009739"/>
-                                                    <rect width="3" height="0.7" y="0.65" fill="#fedd00"/>
-                                                    <circle cx="1.5" cy="1" r="0.35" fill="#012169"/>
+                                                <svg width="24" height="16" viewBox="0 0 30 20" className="rounded-sm">
+                                                    <rect width="30" height="20" fill="#009639"/>
+                                                    <rect x="0" y="7" width="30" height="6" fill="#FEDF00"/>
+                                                    <circle cx="15" cy="10" r="3.5" fill="#002776"/>
                                                 </svg>
                                             </button>
                                             <button
@@ -364,21 +311,20 @@
                                                 }`}
                                                 title="English"
                                             >
-                                                <svg width="24" height="16" viewBox="0 0 19 10" className="rounded-sm">
-                                                    <rect width="19" height="10" fill="#b22234"/>
-                                                    <rect width="19" height="0.769" y="0" fill="#ffffff"/>
-                                                    <rect width="19" height="0.769" y="1.538" fill="#ffffff"/>
-                                                    <rect width="19" height="0.769" y="3.077" fill="#ffffff"/>
-                                                    <rect width="19" height="0.769" y="4.615" fill="#ffffff"/>
-                                                    <rect width="19" height="0.769" y="6.154" fill="#ffffff"/>
-                                                    <rect width="19" height="0.769" y="7.692" fill="#ffffff"/>
-                                                    <rect width="19" height="0.769" y="9.231" fill="#ffffff"/>
-                                                    <rect width="7.6" height="5.385" fill="#3c3b6e"/>
+                                                <svg width="24" height="16" viewBox="0 0 30 20" className="rounded-sm">
+                                                    <rect width="30" height="20" fill="#B22234"/>
+                                                    <rect x="0" y="0" width="30" height="1.54" fill="white"/>
+                                                    <rect x="0" y="3.08" width="30" height="1.54" fill="white"/>
+                                                    <rect x="0" y="6.15" width="30" height="1.54" fill="white"/>
+                                                    <rect x="0" y="9.23" width="30" height="1.54" fill="white"/>
+                                                    <rect x="0" y="12.31" width="30" height="1.54" fill="white"/>
+                                                    <rect x="0" y="15.38" width="30" height="1.54" fill="white"/>
+                                                    <rect x="0" y="18.46" width="30" height="1.54" fill="white"/>
+                                                    <rect x="0" y="0" width="12" height="10.77" fill="#3C3B6E"/>
                                                 </svg>
                                             </button>
                                         </div>
                                         
-                                        {/* Theme Toggle */}
                                         <button
                                             onClick={toggleTheme}
                                             className={`p-2 rounded-lg transition-colors ${
@@ -391,7 +337,6 @@
                                             {isDark ? '☀️' : '🌙'}
                                         </button>
                                         
-                                        {/* Clear Data */}
                                         <button
                                             onClick={() => {
                                                 if (confirm(t.clearDataConfirm)) {
@@ -411,7 +356,6 @@
                             </div>
                         </header>
 
-                        {/* Tabs */}
                         <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} border-b transition-colors duration-200`}>
                             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                                 <div className="flex space-x-8">
@@ -436,7 +380,6 @@
                             </div>
                         </div>
 
-                        {/* Content */}
                         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                             {currentTab === 0 && <DashboardScreen blocks={blocks} patterns={patterns} predictions={predictions} />}
                             {currentTab === 1 && <RegisterScreen onAddBlock={(block) => setBlocks([...blocks, block])} />}
@@ -448,7 +391,6 @@
             );
         }
 
-        // Dashboard Screen
         function DashboardScreen({ blocks, patterns, predictions }) {
             const { isDark, t } = useContext(AppContext);
             
@@ -462,7 +404,6 @@
 
             return (
                 <div className="space-y-6">
-                    {/* Stats Card */}
                     <div className={`bg-gradient-to-r ${
                         isDark 
                             ? 'from-blue-600 to-blue-700' 
@@ -487,7 +428,6 @@
                         </div>
                     </div>
 
-                    {/* Próximas Oportunidades */}
                     <div>
                         <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                             {t.nextOpportunities}
@@ -507,7 +447,6 @@
                         </div>
                     </div>
 
-                    {/* Melhores Estações */}
                     <div>
                         <h3 className={`text-lg font-semibold mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                             {t.bestStations}
@@ -522,21 +461,18 @@
             );
         }
 
-        // Register Screen - Simplified without quick stations
         function RegisterScreen({ onAddBlock }) {
             const { isDark, t } = useContext(AppContext);
             const [station, setStation] = useState('');
             const [value, setValue] = useState('');
             const [accepted, setAccepted] = useState(false);
             
-            // Get user's common stations for autocomplete
             const [existingStations, setExistingStations] = useState(() => {
                 const blocks = JSON.parse(localStorage.getItem('deliveryBlocks') || '[]');
                 const stations = [...new Set(blocks.map(b => b.station))];
                 return stations;
             });
 
-            // Get common values for quick selection
             const [commonValues, setCommonValues] = useState(() => {
                 const blocks = JSON.parse(localStorage.getItem('deliveryBlocks') || '[]');
                 const values = blocks.map(b => b.value).filter(v => v > 0);
@@ -562,12 +498,10 @@
                     };
                     onAddBlock(block);
                     
-                    // Update existing stations
                     if (!existingStations.includes(station.toUpperCase())) {
                         setExistingStations([...existingStations, station.toUpperCase()]);
                     }
                     
-                    // Clear form
                     setStation('');
                     setValue('');
                     setAccepted(false);
@@ -629,7 +563,6 @@
                                     required
                                 />
                                 
-                                {/* Common Values Quick Select */}
                                 {commonValues.length > 0 && (
                                     <div className="mt-2">
                                         <p className={`text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -682,7 +615,6 @@
             );
         }
 
-        // Predictions Screen
         function PredictionsScreen({ predictions }) {
             const { isDark, t } = useContext(AppContext);
             
@@ -712,7 +644,6 @@
             );
         }
 
-        // Prediction Card Component
         function PredictionCard({ prediction }) {
             const { isDark, t } = useContext(AppContext);
             const confidenceClass = prediction.confidence > 0.8 ? 'prediction-high' : 
@@ -757,7 +688,6 @@
             );
         }
 
-        // Analysis Screen
         function AnalysisScreen({ patterns, blocks }) {
             const { isDark, t } = useContext(AppContext);
             
@@ -787,7 +717,6 @@
             );
         }
 
-        // Station Card Component
         function StationCard({ pattern }) {
             const { isDark, t } = useContext(AppContext);
             
@@ -817,7 +746,6 @@
             );
         }
 
-        // Station Analysis Card
         function StationAnalysisCard({ pattern }) {
             const { isDark, t, language } = useContext(AppContext);
             const dayNames = language === 'pt-BR' 
@@ -884,7 +812,6 @@
             );
         }
 
-        // Analysis Functions
         function analyzePatterns(blocks) {
             const stationGroups = blocks.reduce((acc, block) => {
                 if (!acc[block.station]) acc[block.station] = [];
@@ -901,7 +828,6 @@
                 const highValueThreshold = averageValue * 1.2;
                 const highValueBlocks = stationBlocks.filter(b => b.value >= highValueThreshold);
                 
-                // Best hours
                 const hourCounts = highValueBlocks.reduce((acc, block) => {
                     acc[block.hour] = (acc[block.hour] || 0) + 1;
                     return acc;
@@ -912,7 +838,6 @@
                     .slice(0, 3)
                     .map(([hour]) => parseInt(hour));
                 
-                // Best days
                 const dayCounts = highValueBlocks.reduce((acc, block) => {
                     acc[block.dayOfWeek] = (acc[block.dayOfWeek] || 0) + 1;
                     return acc;
@@ -988,7 +913,6 @@
                 .sort((a, b) => b.confidence - a.confidence);
         }
 
-        // Render App
         ReactDOM.render(<DeliveryBlocksApp />, document.getElementById('root'));
     </script>
 </body>
