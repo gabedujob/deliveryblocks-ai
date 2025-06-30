@@ -344,21 +344,23 @@
                                     <div className="flex items-center space-x-4">
                                         {/* Language Toggle */}
                                         <div className="flex items-center space-x-2">
-                                            <button
-                                                onClick={toggleLanguage}
-                                                className={`flag-button text-2xl ${language === 'pt-BR' ? 'opacity-100' : 'opacity-50'}`}
-                                                title="Português"
-                                            >
-                                                🇧🇷
-                                            </button>
-                                            <button
-                                                onClick={toggleLanguage}
-                                                className={`flag-button text-2xl ${language === 'en-US' ? 'opacity-100' : 'opacity-50'}`}
-                                                title="English"
-                                            >
-                                                🇺🇸
-                                            </button>
-                                        </div>
+                                            {/* Language Toggle */}
+<div className="flex items-center space-x-2">
+    <button
+        onClick={toggleLanguage}
+        className={`flag-button text-2xl ${language === 'pt-BR' ? 'opacity-100' : 'opacity-50'}`}
+        title="Português"
+    >
+        🇧🇷
+    </button>
+    <button
+        onClick={toggleLanguage}
+        className={`flag-button text-2xl ${language === 'en-US' ? 'opacity-100' : 'opacity-50'}`}
+        title="English"
+    >
+        🇺🇸
+    </button>
+</div>
                                         
                                         {/* Theme Toggle */}
                                         <button
