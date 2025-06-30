@@ -1,7 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlocksTracker</title>
@@ -11,6 +10,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6020432106902603" crossorigin="anonymous"></script>
     <script>
         tailwind.config = {
             darkMode: 'class'
@@ -19,7 +19,7 @@
     <style>
         body {
             margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
                 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
                 sans-serif;
             -webkit-font-smoothing: antialiased;
@@ -97,7 +97,7 @@
         }
         
         .flag-button {
-            transition: transform 0.2s ease;
+            transition: all 0.2s ease;
         }
         
         .flag-button:hover {
@@ -105,7 +105,6 @@
         }
     </style>
 </head>
-   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6020432106902603" crossorigin="anonymous"></script>
 <body>
     <div id="root"></div>
 
@@ -338,60 +337,46 @@
                         <header className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} shadow-sm border-b transition-colors duration-200`}>
                             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                                 <div className="flex justify-between items-center h-16">
-                                    <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    <h1 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`} style={{fontFamily: 'Inter, sans-serif'}}>
                                         {t.appTitle}
                                     </h1>
                                     
-{/* Language Toggle */}
-<div className="flex items-center space-x-1">
-  <button
-    onClick={toggleLanguage}
-    className={`flag-button p-1 rounded transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${
-      language === 'pt-BR' ? 'opacity-100 scale-110' : 'opacity-60'
-    }`}
-    title="Português"
-  >
-    <svg width="24" height="16" viewBox="0 0 3 2" className="rounded-sm">
-      <rect width="3" height="2" fill="#009739" />
-      <rect width="3" height="0.7" y="0.65" fill="#fedd00" />
-      <circle cx="1.5" cy="1" r="0.35" fill="#012169" />
-    </svg>
-  </button>
-
-  <button
-    onClick={toggleLanguage}
-    className={`flag-button p-1 rounded transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${
-      language === 'en-US' ? 'opacity-100 scale-110' : 'opacity-60'
-    }`}
-    title="English"
-  >
-    <svg width="24" height="16" viewBox="0 0 19 10" className="rounded-sm">
-      <rect width="19" height="10" fill="#b22234" />
-      <rect width="19" height="0.769" y="0" fill="#ffffff" />
-      <rect width="19" height="0.769" y="1.538" fill="#ffffff" />
-      <rect width="19" height="0.769" y="3.077" fill="#ffffff" />
-      <rect width="19" height="0.769" y="4.615" fill="#ffffff" />
-      <rect width="19" height="0.769" y="6.154" fill="#ffffff" />
-      <rect width="19" height="0.769" y="7.692" fill="#ffffff" />
-      <rect width="19" height="0.769" y="9.231" fill="#ffffff" />
-      <rect width="7.6" height="5.385" fill="#3c3b6e" />
-    </svg>
-  </button>
-</div>
-
-        <svg width="24" height="16" viewBox="0 0 19 10" className="rounded-sm">
-            <rect width="19" height="10" fill="#b22234"/>
-            <rect width="19" height="0.769" y="0" fill="#ffffff"/>
-            <rect width="19" height="0.769" y="1.538" fill="#ffffff"/>
-            <rect width="19" height="0.769" y="3.077" fill="#ffffff"/>
-            <rect width="19" height="0.769" y="4.615" fill="#ffffff"/>
-            <rect width="19" height="0.769" y="6.154" fill="#ffffff"/>
-            <rect width="19" height="0.769" y="7.692" fill="#ffffff"/>
-            <rect width="19" height="0.769" y="9.231" fill="#ffffff"/>
-            <rect width="7.6" height="5.385" fill="#3c3b6e"/>
-        </svg>
-    </button>
-</div>
+                                    <div className="flex items-center space-x-4">
+                                        {/* Language Toggle */}
+                                        <div className="flex items-center space-x-1">
+                                            <button
+                                                onClick={toggleLanguage}
+                                                className={`flag-button p-1 rounded transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                                                    language === 'pt-BR' ? 'opacity-100 scale-110' : 'opacity-60'
+                                                }`}
+                                                title="Português"
+                                            >
+                                                <svg width="24" height="16" viewBox="0 0 3 2" className="rounded-sm">
+                                                    <rect width="3" height="2" fill="#009739"/>
+                                                    <rect width="3" height="0.7" y="0.65" fill="#fedd00"/>
+                                                    <circle cx="1.5" cy="1" r="0.35" fill="#012169"/>
+                                                </svg>
+                                            </button>
+                                            <button
+                                                onClick={toggleLanguage}
+                                                className={`flag-button p-1 rounded transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                                                    language === 'en-US' ? 'opacity-100 scale-110' : 'opacity-60'
+                                                }`}
+                                                title="English"
+                                            >
+                                                <svg width="24" height="16" viewBox="0 0 19 10" className="rounded-sm">
+                                                    <rect width="19" height="10" fill="#b22234"/>
+                                                    <rect width="19" height="0.769" y="0" fill="#ffffff"/>
+                                                    <rect width="19" height="0.769" y="1.538" fill="#ffffff"/>
+                                                    <rect width="19" height="0.769" y="3.077" fill="#ffffff"/>
+                                                    <rect width="19" height="0.769" y="4.615" fill="#ffffff"/>
+                                                    <rect width="19" height="0.769" y="6.154" fill="#ffffff"/>
+                                                    <rect width="19" height="0.769" y="7.692" fill="#ffffff"/>
+                                                    <rect width="19" height="0.769" y="9.231" fill="#ffffff"/>
+                                                    <rect width="7.6" height="5.385" fill="#3c3b6e"/>
+                                                </svg>
+                                            </button>
+                                        </div>
                                         
                                         {/* Theme Toggle */}
                                         <button
@@ -755,7 +740,7 @@
                         <p>⏰ {prediction.timeSlot}</p>
                         <p>📅 {prediction.dayOfWeek}</p>
                         <p>{t.predictedValue} <span className={`font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                            {t.value?.includes('$') ? '$' : 'R$'} {Math.round(prediction.predictedValue)}
+                            {t.value?.includes(') ? ' : 'R} {Math.round(prediction.predictedValue)}
                         </span></p>
                     </div>
                     
@@ -816,7 +801,7 @@
                                 📍 {pattern.station}
                             </h4>
                             <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                                {t.value?.includes('$') ? '$' : 'R$'} {Math.round(pattern.averageValue)} • {Math.round(pattern.successRate * 100)}%
+                                {t.value?.includes(') ? ' : 'R} {Math.round(pattern.averageValue)} • {Math.round(pattern.successRate * 100)}%
                             </p>
                         </div>
                         <div className="text-right">
@@ -853,7 +838,7 @@
                                 {t.averageValue}
                             </p>
                             <p className="text-2xl font-bold text-blue-600">
-                                {t.value?.includes('$') ? '$' : 'R$'} {Math.round(pattern.averageValue)}
+                                {t.value?.includes(') ? ' : 'R} {Math.round(pattern.averageValue)}
                             </p>
                         </div>
                         <div className="text-center">
