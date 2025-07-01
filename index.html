@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6020432106902603" crossorigin="anonymous"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
@@ -22,6 +23,44 @@
         .dark .prediction-high { background-color: rgba(34, 197, 94, 0.2); }
         .dark .prediction-medium { background-color: rgba(251, 146, 60, 0.2); }
         .dark .prediction-low { background-color: rgba(156, 163, 175, 0.2); }
+        
+        /* Custom styles for About page */
+        .about-title { font-family: 'Poppins', sans-serif; }
+        .feature-card {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .support-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .support-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            bottom: -50%;
+            left: -50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        .venmo-link {
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        .venmo-link:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
     </style>
 </head>
 <body>
@@ -52,7 +91,7 @@
             const patterns = useMemo(() => analyzePatterns(blocks), [blocks]);
             const predictions = useMemo(() => generatePredictions(patterns), [patterns]);
 
-            const tabs = ['📊 Dashboard', '📝 Register', '🎯 Predictions', '📈 Analysis'];
+            const tabs = ['📊 Dashboard', '📝 Register', '🎯 Predictions', '📈 Analysis', 'ℹ️ About'];
 
             return (
                 <div className={`min-h-screen ${isDark ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
@@ -76,9 +115,9 @@
 
                     <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} border-b`}>
                         <div className="max-w-7xl mx-auto px-4">
-                            <div className="flex space-x-8">
+                            <div className="flex space-x-8 overflow-x-auto">
                                 {tabs.map((tab, index) => (
-                                    <button key={index} onClick={() => setCurrentTab(index)} className={`py-4 px-1 border-b-2 font-medium text-sm ${currentTab === index ? 'tab-active' : `border-transparent ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}`}>
+                                    <button key={index} onClick={() => setCurrentTab(index)} className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${currentTab === index ? 'tab-active' : `border-transparent ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`}`}>
                                         {tab}
                                     </button>
                                 ))}
@@ -91,6 +130,7 @@
                         {currentTab === 1 && <Register onAddBlock={(block) => setBlocks([...blocks, block])} isDark={isDark} />}
                         {currentTab === 2 && <Predictions predictions={predictions} isDark={isDark} />}
                         {currentTab === 3 && <Analysis patterns={patterns} isDark={isDark} />}
+                        {currentTab === 4 && <About isDark={isDark} />}
                     </main>
                 </div>
             );
@@ -236,6 +276,164 @@
                             <p>Register blocks to see analysis</p>
                         </div>
                     )}
+                </div>
+            );
+        }
+
+        function About({ isDark }) {
+            return (
+                <div className="space-y-8 max-w-4xl mx-auto">
+                    <h1 className={`text-4xl font-bold about-title text-center mb-8 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                        About BlocksTracker
+                    </h1>
+
+                    {/* How It Works */}
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
+                        <h2 className={`text-2xl font-bold about-title mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            How It Works
+                        </h2>
+                        <p className={`mb-4 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                            BlocksTracker uses AI-powered analytics to help delivery drivers maximize their earnings by:
+                        </p>
+                        <ul className={`space-y-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <li className="flex items-start">
+                                <span className="mr-2">•</span>
+                                Recording block data (station, value, time, acceptance)
+                            </li>
+                            <li className="flex items-start">
+                                <span className="mr-2">•</span>
+                                Analyzing patterns in your historical data
+                            </li>
+                            <li className="flex items-start">
+                                <span className="mr-2">•</span>
+                                Predicting high-value opportunities
+                            </li>
+                            <li className="flex items-start">
+                                <span className="mr-2">•</span>
+                                Identifying the best stations and time slots
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Key Features */}
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
+                        <h2 className={`text-2xl font-bold about-title mb-6 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            Key Features
+                        </h2>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className={`feature-card p-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                <h3 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    📊 Smart Analytics
+                                </h3>
+                                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    Track performance metrics and success rates
+                                </p>
+                            </div>
+                            <div className={`feature-card p-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                <h3 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    🎯 AI Predictions
+                                </h3>
+                                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    Get confidence-based predictions for upcoming blocks
+                                </p>
+                            </div>
+                            <div className={`feature-card p-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                <h3 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    📈 Pattern Recognition
+                                </h3>
+                                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    Discover your most profitable stations and times
+                                </p>
+                            </div>
+                            <div className={`feature-card p-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                <h3 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    🌓 Dark Mode
+                                </h3>
+                                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    Comfortable viewing in any lighting condition
+                                </p>
+                            </div>
+                            <div className={`feature-card p-4 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                                <h3 className={`font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                    💾 Local Storage
+                                </h3>
+                                <p className={`text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    Your data stays private on your device
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Getting Started */}
+                    <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
+                        <h2 className={`text-2xl font-bold about-title mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                            Getting Started
+                        </h2>
+                        <ol className={`space-y-3 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                            <li className="flex items-start">
+                                <span className="font-bold mr-3">1.</span>
+                                <span><strong>Register blocks</strong> as they appear with station name and value</span>
+                            </li>
+                            <li className="flex items-start">
+                                <span className="font-bold mr-3">2.</span>
+                                <span><strong>Mark accepted blocks</strong> to track your success rate</span>
+                            </li>
+                            <li className="flex items-start">
+                                <span className="font-bold mr-3">3.</span>
+                                <span><strong>View predictions</strong> based on your historical patterns</span>
+                            </li>
+                            <li className="flex items-start">
+                                <span className="font-bold mr-3">4.</span>
+                                <span><strong>Analyze trends</strong> to optimize your strategy</span>
+                            </li>
+                        </ol>
+                    </div>
+
+                    {/* Privacy & Tips */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
+                            <h2 className={`text-xl font-bold about-title mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                Privacy First
+                            </h2>
+                            <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                All data is stored locally on your device. No personal information is collected or transmitted.
+                            </p>
+                        </div>
+
+                        <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
+                            <h2 className={`text-xl font-bold about-title mb-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                                Tips for Success
+                            </h2>
+                            <ul className={`space-y-2 text-sm ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                                <li>• Register all blocks, not just accepted ones</li>
+                                <li>• Be consistent with station names</li>
+                                <li>• Check predictions before going online</li>
+                                <li>• Focus on high-confidence opportunities</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Support Section */}
+                    <div className="support-section rounded-lg shadow-xl p-8 text-white relative">
+                        <h2 className="text-3xl font-bold about-title mb-4 text-center">
+                            Support This Project
+                        </h2>
+                        <p className="text-center mb-6 text-lg">
+                            💝 If BlocksTracker has helped improve your earnings and you'd like to support its development, consider buying me a coffee! Your contribution helps keep the app free and supports future improvements.
+                        </p>
+                        <div className="text-center">
+                            <p className="text-xl mb-2">📧 Venmo:</p>
+                            <a 
+                                href="https://venmo.com/dsreis98" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="venmo-link text-2xl font-bold text-white hover:text-yellow-300"
+                            >
+                                https://venmo.com/dsreis98
+                            </a>
+                            <p className="mt-4 text-lg">☕ Every contribution is greatly appreciated!</p>
+                        </div>
+                    </div>
                 </div>
             );
         }
